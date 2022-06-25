@@ -1,0 +1,2 @@
+./yolo_v5+feature_inversion/face_data/img/face1.jpg
+./yolo_v5+feature_inversion/face_data/img/face2.jpg
