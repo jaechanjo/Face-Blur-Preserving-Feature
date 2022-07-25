@@ -75,7 +75,11 @@ def apply_blackbox(img, pos):
 def face_blur_GAN_single(img, save_path=None, G_model_path='./weights/G_100_no.pth', Y_model_path='./weights/face_l.pt', transform=None,
                          img_size=640, conf_thres=0.5, iou_thres=0.5, device='0'):                           
     
-    # image: dtype is np.array            
+    # image: dtype is np.array
+    # weights: no_residual block G_model_path='./weights/G_100_no.pth'
+    #             -> G = GeneratorResNet_no_residual_block(3)
+    #          exist residual block G_model_path='./weights/G_100.pth'
+    #             -> G = GeneratorResNet(3, 9)
 
     # Load detector model
     device = select_device(device)
@@ -127,12 +131,19 @@ def face_blur_GAN_single(img, save_path=None, G_model_path='./weights/G_100_no.p
     bboxes = torch.Tensor(bboxes[0])
     bboxes = bboxes.unsqueeze(0)
     
-    # Load Generator model
+    # Load Generator model - no residual block, G_100_no.pth
     G = GeneratorResNet_no_residual_block(3)
     G = Wrapper(G)
     G = nn.DataParallel(G.cuda())
     G.load_state_dict(torch.load(G_model_path))
     G.eval()
+    
+    # exist residual block, G_100.pth
+#     G = GeneratorResNet(3, 9)
+#     G = Wrapper(G)
+#     G = nn.DataParallel(G.cuda())
+#     G.load_state_dict(torch.load(G_model_path))
+#     G.eval()
     
     generated_img = G(blur, image, bboxes)
     generated_img = make_grid(generated_img, nrow=5, normalize=True)
@@ -149,4 +160,4 @@ def face_blur_GAN_single(img, save_path=None, G_model_path='./weights/G_100_no.p
 
 # +
 #test
-# blur_img = face_blur_GAN_single(test_img, save_path='./data/result/blur_face1.jpg')
+# blur_img = face_blur_GAN_single(test_img, save_path='./data/result/blur_face2_no.jpg')
