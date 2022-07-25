@@ -1,6 +1,6 @@
 # face-blur
 
-### Jaechan Jo, Jongseok Lee, Sogang multi-media-system lab, Master's students
+### Jaechan Jo, Jongseok Lee, Sogang multi-media-system lab
 
 ## feature inversion
 1. multi images to multi faces of multi blur images
