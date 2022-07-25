@@ -1,3 +1,0 @@
-./face_data/resize/640/face1_640.jpg
-./face_data/resize/640/face2_640.jpg
-./face_data/resize/640/face3_640.jpg
