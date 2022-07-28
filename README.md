@@ -12,17 +12,17 @@ De-identify the face while preserving image feature using feature inversion, cyc
 
 - Feature Inversion
 
-  - <img width="1000" alt="teaser" src="./data/result/blur_eunbin2.jpg">
+  - <img width="300" alt="teaser" src="./data/result/blur_eunbin2.jpg">
 
 - CycleGAN
   - residual block
 
-    <img width="800" alt="teaser" src="./face_blur_cycleGAN/data/result/blur_face1.jpg">
+    <img width="300" alt="teaser" src="./face_blur_cycleGAN/data/result/blur_face1.jpg">
 
 
   - no residual block
 
-    <img width="800" alt="teaser" src="./face_blur_cycleGAN/data/result/blur_face1_no.jpg">
+    <img width="300" alt="teaser" src="./face_blur_cycleGAN/data/result/blur_face1_no.jpg">
 
 
 ## Model
