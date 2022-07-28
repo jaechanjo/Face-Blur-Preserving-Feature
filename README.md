@@ -85,10 +85,10 @@ De-identify the face while preserving image feature using feature inversion, cyc
 
 ## Inference code
 
-### 1. Multi images with Multi-faces
+### - Multi images with Multi-faces
 
 
-- face_blur_feature_inversion.py
+1. face_blur_feature_inversion.py
   
   ```
   python face_blur_feature_inversion.py \
@@ -99,27 +99,27 @@ De-identify the face while preserving image feature using feature inversion, cyc
   --eval [boolean: True | False]
   ```
 
-- face_blur_feature_inversion_func_ver.py
+2. face_blur_feature_inversion_func_ver.py
 
   ```
   def face_blur_multi(distort_weight=[int: 1-5], fade_weight=[int: 1-5], dataset_folder=[str: image path], \
   save_folder=[None | str: save path], weights=[str: yolov5 weight path], eval = [boolean: True | False])
   ```
 
-### 2. One images with Multi-faces
+### - One images with Multi-faces
 
 
-- face_blur_feature_inversion_func_single.py
+3. face_blur_feature_inversion_func_single.py
 
   ```
   def face_blur_single(image, distort_weight=[int: 1-5], fade_weight=[int: 1-5], save_folder=[None | str: save path], \
   weights=[str: yolov5 weight path], eval = [boolean: True | False])
   ```
 
-### 3. One images with One-faces
+### - One images with One-faces
 
 
-- face_blur_GAN_func_single.py
+4. face_blur_GAN_func_single.py
 
   ```
   def face_blur_GAN_single(img, save_path=[None | str: save path], \
