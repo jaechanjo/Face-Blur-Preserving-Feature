@@ -72,14 +72,28 @@ def apply_blackbox(img, pos):
     return image
 
 
+# +
 def face_blur_GAN_single(img, save_path=None, G_model_path='./weights/G_100_no.pth', Y_model_path='./weights/face_l.pt', transform=None,
                          img_size=640, conf_thres=0.5, iou_thres=0.5, device='0'):                           
     
-    # image: dtype is np.array
-    # weights: no_residual block G_model_path='./weights/G_100_no.pth'
-    #             -> G = GeneratorResNet_no_residual_block(3)
-    #          exist residual block G_model_path='./weights/G_100.pth'
-    #             -> G = GeneratorResNet(3, 9)
+'''
+Explain
+
+- Adjusted_params
+> > img: type=numpy.ndarray help=image to make blur : content_image
+
+
+- Additional_params
+> > save_path: type=str, default=None, help=directory to save blur images
+> > G_model_path: type=str, default='./weights/G_100_no.pth', help=(Generator)_model.pt path(s)
+> > Y_model_path: type=str, default='./weights/face_l.pt', help=(Yolov5)_model.pt path(s)
+> > transform: type=str, default=None, help=To do transform
+> > img_size: type=int, default=640, help=(face_detector)_inference size (pixels)
+> > conf_thres: type=float, default=0.5, help=(face_detector)_object confidence threshold
+> > iou_thres:  type=float, default=0.5, help=(face_detector)_IOU threshold for NMS
+> > device: type=str, default='0', help=cuda device, i.e. 0 or 0,1,2,3 or cpu
+'''
+
 
     # Load detector model
     device = select_device(device)
@@ -89,7 +103,7 @@ def face_blur_GAN_single(img, save_path=None, G_model_path='./weights/G_100_no.p
     boxes = detect(model, img, img_size, conf_thres, iou_thres, device)
     
     # np.array-> PIL.Image                    
-    img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+    img = Image.fromarray(img)
     blur = copy.deepcopy(img)
     o_h, o_w = img.size[1], img.size[0]
     
@@ -149,6 +163,7 @@ def face_blur_GAN_single(img, save_path=None, G_model_path='./weights/G_100_no.p
     generated_img = make_grid(generated_img, nrow=5, normalize=True)
     generated_img = transform_tensor_to_image(generated_img)
     generated_img = np.array(generated_img)
+    generated_img = cv2.cvtColor(generated_img, cv2.COLOR_BGR2RGB)
     generated_img = cv2.resize(generated_img, (o_w, o_h))
 
     if save_path is None:
@@ -159,5 +174,15 @@ def face_blur_GAN_single(img, save_path=None, G_model_path='./weights/G_100_no.p
     return generated_img #np.array
 
 # +
+# test_img = cv2.imread('./data/img/face1.jpg')
+# test_img=cv2.cvtColor(test_img, cv2.COLOR_RGB2BGR)
+# plt.imshow(test_img)
+# plt.show()
+
+# +
 #test
-# blur_img = face_blur_GAN_single(test_img, save_path='./data/result/blur_face2_no.jpg')
+# blur_img = face_blur_GAN_single(test_img, save_path='./data/result/blur_face2.jpg')
+
+# +
+# plt.imshow(blur_img)
+# plt.show()

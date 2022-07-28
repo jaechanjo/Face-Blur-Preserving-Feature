@@ -1,4 +1,17 @@
-# function wrapping #
+# -*- coding: utf-8 -*-
+# ---
+# jupyter:
+#   jupytext:
+#     text_representation:
+#       extension: .py
+#       format_name: light
+#       format_version: '1.5'
+#       jupytext_version: 1.11.4
+#   kernelspec:
+#     display_name: Python 3 (ipykernel)
+#     language: python
+#     name: python3
+# ---
 
 import torch
 import torch.nn as nn
@@ -93,27 +106,32 @@ def rescale(x): # MINMAX Standardization
 
 
 # +
-def face_blur(distort_weight, fade_weight, dataset_folder, save_folder=None, weights='./weights/face_l.pt', img_size=640, conf_thres=0.5, iou_thres=0.5, 
-              iteration=400, device='0', eval = False):
+def face_blur_multi(distort_weight, fade_weight, dataset_folder, save_folder=None, weights='./weights/face_l.pt', img_size=640, conf_thres=0.5, iou_thres=0.5, 
+                    iteration=400, device='0', eval = False):
     
-# Explain
-## Adjusted_params
+    
+"""
+Explain
 
-#      distort_weight: --help: As the weight increases, the face becomes increasingly distorted.(1~5)
-#                     {1: 5, 2: 6, 3: 7, 4: 8, 5: 9}
-#      fade_weight: --help: As the weight increases, the face gradually fades.(1~5) 
-#                  {1: 3e11, 2: 7e11, 3: 1e12, 4: 5e12, 5: 9e12}
-#      dataset_folder', default='../WiderFace/val/images/', type=str, help='dataset path' #Content_images_directory
+- Adjusted_params
+> > image(single): type=numpy.ndarray help=image to make blur : content_image
+> > distort_weight: type=int, default=1, help=(1~5) As the weight increases, the face becomes increasingly distorted.
+> > fade_weight: type=int, default=1, help=(1~5) As the weight increases, the face gradually fades.
+> > dataset_folder(multi): type=str, help=original content face images directory
 
-## Additional_params
-#      save_folder', default='./widerface_evaluate/widerface_txt/', type=str, help='Dir to save txt results' #후에 모자이크한 이미지 저장 경로
-#      iteration, type=int, default=500, help= do how many feature-inversion about a image.
-#      weights', nargs='+', type=str, default='runs/train/exp5/weights/last.pt', help='model.pt path(s) #face_l.pt를 기본 가중치로 사용.
-#      img-size', type=int, default=640, help='inference size (pixels)' #어떤 이미지든 640으로 변환해서 처리하자.
-#     conf-thres: type=float, default=0.02, help='object confidence threshold' #confidence도 0.5이상으로 맞추자. (가능한 정확한 값만)
-#     iou-thres: type=float, default=0.5, help='IOU threshold for NMS'
-#     device: default='0,1', help='cuda device, i.e. 0 or 0,1,2,3 or cpu'
-#     eval: show various measurement : result_blur_image, inference_time, cosine_similarity, de-identification value
+
+- Additional_params
+> > save_folder: type=str, default=None, help=directory to save blur images
+> > weights: type=str, default='./weights/face_l.pt', help=(face_detector)_model.pt path(s)
+> > img_size: type=int, default=640, help=(face_detector)_inference size (pixels)
+> > conf_thres: type=float, default=0.5, help=(face_detector)_object confidence threshold
+> > iou_thres:  type=float, default=0.5, help=(face_detector)_IOU threshold for NMS
+> > iteration: type=int, default=400, help=how many iterations to feature-inversion
+> > device: type=str, default='0', help=cuda device, i.e. 0 or 0,1,2,3 or cpu
+> > eval: type=str, default=False, help=show various evaluation tools : blur_image, inference_time, cos_similarity, de-identification value(SSIM)
+"""
+
+
     
     if eval:
         #time check
@@ -311,4 +329,4 @@ def face_blur(distort_weight, fade_weight, dataset_folder, save_folder=None, wei
 
 # +
 # Test
-# blur_list = face_blur(distort_weight = 5, fade_weight = 2, dataset_folder = './data/img/', save_folder = None, eval=False)
+# blur_list = face_blur_multi(distort_weight = 5, fade_weight = 2, dataset_folder = './data/img/', save_folder = None, eval=False)

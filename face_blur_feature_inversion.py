@@ -1,4 +1,17 @@
-# command line interface #
+# -*- coding: utf-8 -*-
+# ---
+# jupyter:
+#   jupytext:
+#     text_representation:
+#       extension: .py
+#       format_name: light
+#       format_version: '1.5'
+#       jupytext_version: 1.11.4
+#   kernelspec:
+#     display_name: Python 3 (ipykernel)
+#     language: python
+#     name: python3
+# ---
 
 import torch
 import torch.nn as nn
@@ -100,14 +113,14 @@ if __name__ == '__main__':
     parser.add_argument('--distort_weight', nargs='?', type=int, default=1, help='(1~5) As the weight increases, the face becomes increasingly distorted.')
     parser.add_argument('--fade_weight', nargs='?', type=int, default=1, help='(1~5) As the weight increases, the face gradually fades.')
     parser.add_argument('--dataset_folder', type=str, help='original content face images directory')
-    parser.add_argument('--save_folder', type=str, default=None, help='Dir to save blur results')
-    parser.add_argument('--weights', nargs='+', type=str, default='./weights/face_l.pt', help='model.pt path(s)')
-    parser.add_argument('--img_size', type=int, default=640, help='inference size (pixels)')
-    parser.add_argument('--conf_thres', type=float, default=0.5, help='object confidence threshold')
-    parser.add_argument('--iou_thres', type=float, default=0.5, help='IOU threshold for NMS')
-    parser.add_argument('--iteration', type=int, default=400, help='how many feature-inversion about a image')
-    parser.add_argument('--device', default='0', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
-    parser.add_argument('--eval', type=str, default=False, help='show various measurement : image, time, cos_similarity, de-identification value')
+    parser.add_argument('--save_folder', type=str, default=None, help='directory to save blur images')
+    parser.add_argument('--weights', nargs='+', type=str, default='./weights/face_l.pt', help='(face_detector)_model.pt path(s)')
+    parser.add_argument('--img_size', type=int, default=640, help='(face_detector)_inference size (pixels)')
+    parser.add_argument('--conf_thres', type=float, default=0.5, help='(face_detector)_object confidence threshold')
+    parser.add_argument('--iou_thres', type=float, default=0.5, help='(face_detector)_IOU threshold for NMS')
+    parser.add_argument('--iteration', type=int, default=400, help='how many iterations to feature-inversion')
+    parser.add_argument('--device', type=str, default='0', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
+    parser.add_argument('--eval', type=str, default=False, help='show various evaluation tools : blur_image, inference_time, cos_similarity, de-identification value(SSIM)')
     
     opt = parser.parse_args()
     print(opt)
