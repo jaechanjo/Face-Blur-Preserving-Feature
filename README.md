@@ -36,6 +36,7 @@ De-identify the face while preserving image feature using feature inversion, cyc
 > - [Yolov5 face-large: face_l.pt](https://drive.google.com/file/d/1G4o3pS1SnyPG35lNvdqhHEMR7bhBTgmH/view?usp=sharing)
 > - [Yolov5 face-medium: face_m.pt](https://drive.google.com/file/d/1WSgaSLphrUrb07FPMC9SHDOMk23U1LHH/view?usp=sharing)
 
+
 ### 1. Feature Inversion
 
 ```Yolov5(face-detector) > SqueezeNet(CNN-feature inversion)```
@@ -58,7 +59,6 @@ De-identify the face while preserving image feature using feature inversion, cyc
 >   - ```iteration```: type=int, default=400, help=how many iterations to feature-inversion
 >   - ```device```: type=str, default='0', help=cuda device, i.e. 0 or 0,1,2,3 or cpu
 >   - ```eval```: type=str, default=False, help=show various evaluation tools : blur_image, inference_time, cos_similarity, de-identification value(SSIM)
-
 
 
 ### 2. CycleGAN
@@ -85,8 +85,8 @@ De-identify the face while preserving image feature using feature inversion, cyc
 
 ## Inference code
 
-### - Multi images with Multi-faces
 
+### Multi images with Multi-faces
 
 1. face_blur_feature_inversion.py
   
@@ -106,8 +106,8 @@ De-identify the face while preserving image feature using feature inversion, cyc
   save_folder=[None | str: save path], weights=[str: yolov5 weight path], eval = [boolean: True | False])
   ```
 
-### - One images with Multi-faces
 
+### One images with Multi-faces
 
 3. face_blur_feature_inversion_func_single.py
 
@@ -116,7 +116,9 @@ De-identify the face while preserving image feature using feature inversion, cyc
   weights=[str: yolov5 weight path], eval = [boolean: True | False])
   ```
 
-### - One images with One-faces
+
+### One images with One-faces
+
 
 
 4. face_blur_GAN_func_single.py
