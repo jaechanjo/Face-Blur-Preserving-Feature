@@ -26,8 +26,8 @@
 > > - conf_thres: type=float, default=0.5, help=(face_detector)_object confidence threshold
 > > - iou_thres:  type=float, default=0.5, help=(face_detector)_IOU threshold for NMS
 > > - iteration, type=int, default=400, help=how many iterations to feature-inversion
-> > - device, type=str, default='0', help=cuda device, i.e. 0 or 0,1,2,3 or cpu
-> > - eval, type=str, default=False, help=show various evaluation tools : blur_image, inference_time, cos_similarity, de-identification value(SSIM)
+> > - **device**: type=str, default='0', help=cuda device, i.e. 0 or 0,1,2,3 or cpu
+> > - **eval**: type=str, default=False, help=show various evaluation tools : blur_image, inference_time, cos_similarity, de-identification value(SSIM)
 
 1. multi-images to multi-blur images with multi-faces
 
