@@ -2,7 +2,7 @@
 
 Official Pytorch implementation of Face-Blur Model
 
-**[Jaechan Jo](mailto:jjc123a@naver.com),  Jongseok Lee.**
+**[Jaechan Jo](mailto:jjc123a@naver.com), Jongseok Lee.**
 
 Multi Media System Lab, Sogang AI Research.
 
