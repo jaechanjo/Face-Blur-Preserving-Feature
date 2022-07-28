@@ -13,10 +13,10 @@
 ### hyper-parameter description
 
 > Adjusted_params
-> > image(single): type=numpy.ndarray help=image to make blur : content_image
-> > distort_weight: type=int, default=1, help=(1~5) As the weight increases, the face becomes increasingly distorted.
-> > fade_weight: type=int, default=1, help=(1~5) As the weight increases, the face gradually fades.
-> > dataset_folder(multi): type=str, help=original content face images directory
+> > - image(single): type=numpy.ndarray help=image to make blur : content_image
+> > - distort_weight: type=int, default=1, help=(1~5) As the weight increases, the face becomes increasingly distorted.
+> > - fade_weight: type=int, default=1, help=(1~5) As the weight increases, the face gradually fades.
+> > - dataset_folder(multi): type=str, help=original content face images directory
 
 
 > Additional_params
