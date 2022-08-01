@@ -1,6 +1,6 @@
 # Face-Blur
 
-Official Pytorch implementation of Face-Blur Model | [Paper](https://drive.google.com/file/d/1rcAKXrNS7_2if1CG3Y-UUWHdAXm_TsTP/view?usp=sharing)
+Official Pytorch implementation of Face-Blur Model | [Paper](https://drive.google.com/file/d/14Krwy55_S4TZ3VeRlEemMd-R0gWAk0ml/view?usp=sharing)
 
 **[Jaechan Jo](mailto:jjc123a@naver.com), Jongseok Lee.**
 
@@ -29,12 +29,12 @@ De-identify the face while preserving image feature using feature inversion, cyc
 
 ### 0. Weight
 
-- [CycleGAN-residual block: G_100.pth](https://drive.google.com/file/d/1RdB5e_TQKDuCGqxOqfp5W1PI65xu8UU8/view?usp=sharing)
-- [CycleGAN-no residual block: G_100_no.pth](https://drive.google.com/file/d/1fzLMqogb5k8ZMLvYs9yulobNGdVTDBci/view?usp=sharing)
+- [CycleGAN-residual block: G_100.pth](https://drive.google.com/file/d/1SDpJphwBbtVAnOwDXUOJBqBIMTDuGK9b/view?usp=sharing)
+- [CycleGAN-no residual block: G_100_no.pth](https://drive.google.com/file/d/1nWka8iwygB4uRXHty2x9JUSeCsyRlf9R/view?usp=sharing)
 
 > Source from [GitHub - deepcam-cn/yolov5-face: YOLO5Face: Why Reinventing a Face Detector (https://arxiv.org/abs/2105.12931)](https://github.com/deepcam-cn/yolov5-face)
-> - [Yolov5 face-large: face_l.pt](https://drive.google.com/file/d/1G4o3pS1SnyPG35lNvdqhHEMR7bhBTgmH/view?usp=sharing)
-> - [Yolov5 face-medium: face_m.pt](https://drive.google.com/file/d/1WSgaSLphrUrb07FPMC9SHDOMk23U1LHH/view?usp=sharing)
+> - [Yolov5 face-large: face_l.pt](https://drive.google.com/file/d/1uWR7O4ka6dJitWLc9zR3kwFJhpsmCeqj/view?usp=sharing)
+> - [Yolov5 face-medium: face_m.pt](https://drive.google.com/file/d/1blTdj5GXR8T5RoWGnNDXdx5ljPEag3Bh/view?usp=sharing)
 
 
 ### 1. Feature Inversion
