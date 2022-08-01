@@ -127,5 +127,4 @@ De-identify the face while preserving image feature using feature inversion, cyc
   def face_blur_GAN_single(img, save_path=[None | str: save path],
   G_model_path=[str: generator weight path], Y_model_path=[str: yolov5(face_detector) weight path])
   ```
-                         
-                         
+  
