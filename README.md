@@ -23,7 +23,7 @@ De-identify the face while preserving image feature using feature inversion, cyc
   - no residual block
 
     <img width="300" alt="teaser" src="./face_blur_cycleGAN/data/result/blur_face1_no.jpg">
-
+  
 
 ## Model
 
@@ -81,6 +81,18 @@ De-identify the face while preserving image feature using feature inversion, cyc
 >   - ```iou_thres```: (face_detector) IOU threshold for NMS
 >   - ```device```: cuda device, i.e. 0 or 0,1,2,3 or cpu
 
+
+## Setup
+
+### Docker compose
+
+```docker run --gpus all -itd -e LC_ALL=C.UTF-8 --name face_blur -v"[gpu server dir]":/workspace/ -p 20000:8888 -p 20001:8097 -p 20002:22 nvcr.io/nvidia/pytorch:21.07-py3 /bin/bash```
+
+  > - **docker name(이름 정의)**: e.g.) face_blur
+  > - **gpu server dir(도커 가상환경에 연결할 GPU 서버 폴더 경로)**: git clone dir(깃클론한 폴더 경로) e.g.) /media/mmlab/hdd3/Face-Blur-Preserving-Feature 
+  > - **mounted docker dir(연결된 도커 폴더 경로)**: e.g.) /workspace/
+  > - **port forwading(포트 설정)**: e.g.) 20000:8888(jupyter), 20001:8097(visdom), 20002:22(ssh)
+  > - **docker image(도커 이미지)**: e.g.) nvcr.io/nvidia/pytorch:21.07-py3
 
 
 ## Inference code
