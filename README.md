@@ -1,6 +1,6 @@
 # Face-Blur
 
-Official Pytorch implementation of Face-Blur Model
+Official Pytorch implementation of Face-Blur Model | [Paper](https://drive.google.com/file/d/14Krwy55_S4TZ3VeRlEemMd-R0gWAk0ml/view?usp=sharing)
 
 **[Jaechan Jo](mailto:jjc123a@naver.com), Jongseok Lee.**
 
@@ -23,18 +23,18 @@ De-identify the face while preserving image feature using feature inversion, cyc
   - no residual block
 
     <img width="300" alt="teaser" src="./face_blur_cycleGAN/data/result/blur_face1_no.jpg">
-
+  
 
 ## Model
 
 ### 0. Weight
 
-- [CycleGAN-residual block: G_100.pth](https://drive.google.com/file/d/1RdB5e_TQKDuCGqxOqfp5W1PI65xu8UU8/view?usp=sharing)
-- [CycleGAN-no residual block: G_100_no.pth](https://drive.google.com/file/d/1fzLMqogb5k8ZMLvYs9yulobNGdVTDBci/view?usp=sharing)
+- [CycleGAN-residual block: G_100.pth](https://drive.google.com/file/d/1SDpJphwBbtVAnOwDXUOJBqBIMTDuGK9b/view?usp=sharing)
+- [CycleGAN-no residual block: G_100_no.pth](https://drive.google.com/file/d/1nWka8iwygB4uRXHty2x9JUSeCsyRlf9R/view?usp=sharing)
 
 > Source from [GitHub - deepcam-cn/yolov5-face: YOLO5Face: Why Reinventing a Face Detector (https://arxiv.org/abs/2105.12931)](https://github.com/deepcam-cn/yolov5-face)
-> - [Yolov5 face-large: face_l.pt](https://drive.google.com/file/d/1G4o3pS1SnyPG35lNvdqhHEMR7bhBTgmH/view?usp=sharing)
-> - [Yolov5 face-medium: face_m.pt](https://drive.google.com/file/d/1WSgaSLphrUrb07FPMC9SHDOMk23U1LHH/view?usp=sharing)
+> - [Yolov5 face-large: face_l.pt](https://drive.google.com/file/d/1uWR7O4ka6dJitWLc9zR3kwFJhpsmCeqj/view?usp=sharing)
+> - [Yolov5 face-medium: face_m.pt](https://drive.google.com/file/d/1blTdj5GXR8T5RoWGnNDXdx5ljPEag3Bh/view?usp=sharing)
 
 
 ### 1. Feature Inversion
@@ -82,6 +82,18 @@ De-identify the face while preserving image feature using feature inversion, cyc
 >   - ```device```: cuda device, i.e. 0 or 0,1,2,3 or cpu
 
 
+## Setup
+
+### Docker compose
+
+```docker run --gpus all -itd -e LC_ALL=C.UTF-8 --name face_blur -v"[gpu server dir]":/workspace/ -p 20000:8888 -p 20001:8097 -p 20002:22 nvcr.io/nvidia/pytorch:21.07-py3 /bin/bash```
+
+  > - **docker name(이름 정의)**: e.g.) face_blur
+  > - **gpu server dir(도커 가상환경에 연결할 GPU 서버 폴더 경로)**: git clone dir(깃클론한 폴더 경로를 넣어주세요) e.g.) /media/mmlab/hdd3/Face-Blur-Preserving-Feature 
+  > - **mounted docker dir(연결된 도커 폴더 경로)**: e.g.) /workspace/
+  > - **port forwading(포트 설정)**: e.g.) 20000:8888(jupyter), 20001:8097(visdom), 20002:22(ssh)
+  > - **docker image(도커 이미지)**: e.g.) nvcr.io/nvidia/pytorch:21.07-py3
+
 
 ## Inference code
 
@@ -102,7 +114,7 @@ De-identify the face while preserving image feature using feature inversion, cyc
 2. face_blur_feature_inversion_func_ver.py
 
   ```
-  def face_blur_multi(distort_weight=[int: 1-5], fade_weight=[int: 1-5], dataset_folder=[str: image path], \
+  def face_blur_multi(distort_weight=[int: 1-5], fade_weight=[int: 1-5], dataset_folder=[str: image path],
   save_folder=[None | str: save path], weights=[str: yolov5 weight path], eval = [boolean: True | False])
   ```
 
@@ -112,7 +124,7 @@ De-identify the face while preserving image feature using feature inversion, cyc
 3. face_blur_feature_inversion_func_single.py
 
   ```
-  def face_blur_single(image, distort_weight=[int: 1-5], fade_weight=[int: 1-5], save_folder=[None | str: save path], \
+  def face_blur_single(image, distort_weight=[int: 1-5], fade_weight=[int: 1-5], save_folder=[None | str: save path],
   weights=[str: yolov5 weight path], eval = [boolean: True | False])
   ```
 
@@ -124,8 +136,7 @@ De-identify the face while preserving image feature using feature inversion, cyc
 4. face_blur_GAN_func_single.py
 
   ```
-  def face_blur_GAN_single(img, save_path=[None | str: save path], \
+  def face_blur_GAN_single(img, save_path=[None | str: save path],
   G_model_path=[str: generator weight path], Y_model_path=[str: yolov5(face_detector) weight path])
   ```
-                         
-                         
+  
