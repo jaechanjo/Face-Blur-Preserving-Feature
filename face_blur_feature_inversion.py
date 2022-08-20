@@ -196,15 +196,29 @@ if __name__ == '__main__':
             # bounding box list
             bbox_list.append( (x1,y1,x2,y2) )
 
-            # delete face bbox
-            imgB[y1:y2, x1:x2, :] -= imgB[y1:y2, x1:x2, :]
+            # eclipse synthesize
+            #center (x,y)
+            x = (x1+x2)//2
+            y = (y1+y2)//2
 
-            #synthesize uniform random noise
-            imgB[y1:y2, x1:x2, :] += np.array(np.random.uniform(low=0, high=255, size=(y2-y1, x2-x1, 3)), dtype='uint8')# 픽셀값 0~255 정수
+            #long_axis, short_axis
+            l = round((y2-y1)*(9/16))
+            s = round((x2-x1)*(5/8))
+
+            #make eclipse mask
+            mask = np.zeros((h,w), dtype=np.int8)
+            cv2.ellipse(mask, (x, y), (l, s), 90, 0, 360, (1,1,1), -1)
+
+            # delete face bounding circle
+            imgB = imgB - imgB*mask[...,np.newaxis]
+
+            # synthesize blur face circle
+            random = np.array(np.random.uniform(low=0, high=255, size=(h, w, 3)), dtype='uint8')# 0~255
+            imgB = imgB + random*mask[...,np.newaxis]
                 
         # numpy(cv2) -> torch.Tensor | Resize(512) | Normalize(squeeze_mean, squeeze_std)
         imgC = preprocess(PIL.Image.fromarray(imgC))
-        imgB = preprocess(PIL.Image.fromarray(imgB))
+        imgB = preprocess(PIL.Image.fromarray(imgB.astype(np.uint8)))
         
         # Extract Zero(original)_image feature
         featsC = extract_features(imgC, cnn, device=device)
@@ -258,18 +272,31 @@ if __name__ == '__main__':
             
             if not opt.eval == 'False':
                 #imgD == imgC for now
-                de_identifi += 1 - SSIM_score(original_crop = PIL.Image.fromarray(imgD[bbox[1]:bbox[3], bbox[0]:bbox[2], :]), 
-                                              generate_crop = PIL.Image.fromarray(imgB_result[bbox[1]:bbox[3], bbox[0]:bbox[2], :]),
+                de_identifi += 1 - SSIM_score(original_crop = PIL.Image.fromarray(imgD[bbox[1]:bbox[3], bbox[0]:bbox[2], :].astype(np.uint8)), 
+                                              generate_crop = PIL.Image.fromarray(imgB_result[bbox[1]:bbox[3], bbox[0]:bbox[2], :].astype(np.uint8)),
                                               device=device)
 
-            # delete face bbox
-            imgD[bbox[1]:bbox[3], bbox[0]:bbox[2], :] -= imgD[bbox[1]:bbox[3], bbox[0]:bbox[2], :]
-            
-            # synthesize blur result faces
-            imgD[bbox[1]:bbox[3], bbox[0]:bbox[2], :] += imgB_result[bbox[1]:bbox[3], bbox[0]:bbox[2], :]
+            #eclipse synthesize
+            #center (x,y)
+            x = (bbox[0]+bbox[2])//2
+            y = (bbox[1]+bbox[3])//2
+
+            #long_axis, short_axis
+            l = round((y2-y1)*(9/16))
+            s = round((x2-x1)*(5/8))
+
+            #make eclipse mask
+            mask = np.zeros((h,w), dtype=np.int8)
+            cv2.ellipse(mask, (x, y), (l, s), 90, 0, 360, (1,1,1), -1)
+
+            # delete face bounding circle
+            imgD = imgD - imgD*mask[...,np.newaxis]
+
+            # synthesize blur face circle
+            imgD = imgD + imgB_result*mask[...,np.newaxis]
         
         # np.array -> PIL.Image
-        imgD = PIL.Image.fromarray(imgD)
+        imgD = PIL.Image.fromarray(imgD.astype(np.uint8))
         
         # Extract Blur faces+ Content images
         featsD = extract_features(preprocess(imgD), cnn, device=device)

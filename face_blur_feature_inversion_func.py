@@ -105,34 +105,34 @@ def rescale(x): # MINMAX Standardization
     return x_rescaled
 
 
-# +
-def face_blur_multi(distort_weight, fade_weight, dataset_folder, save_folder=None, weights='./weights/face_l.pt', img_size=640, conf_thres=0.5, iou_thres=0.5, 
-                    iteration=400, device='0', eval = False):
+# -
+
+def face_blur(distort_weight, fade_weight, dataset_folder, save_folder=None, weights='./weights/face_l.pt', img_size=640, conf_thres=0.5, iou_thres=0.5,
+              iteration=400, device='0', eval = False):
     
     
-"""
-Explain
+    """
+    Explain
 
-- Adjusted_params
-> > image(single): type=numpy.ndarray help=image to make blur : content_image
-> > distort_weight: type=int, default=1, help=(1~5) As the weight increases, the face becomes increasingly distorted.
-> > fade_weight: type=int, default=1, help=(1~5) As the weight increases, the face gradually fades.
-> > dataset_folder(multi): type=str, help=original content face images directory
-
-
-- Additional_params
-> > save_folder: type=str, default=None, help=directory to save blur images
-> > weights: type=str, default='./weights/face_l.pt', help=(face_detector)_model.pt path(s)
-> > img_size: type=int, default=640, help=(face_detector)_inference size (pixels)
-> > conf_thres: type=float, default=0.5, help=(face_detector)_object confidence threshold
-> > iou_thres:  type=float, default=0.5, help=(face_detector)_IOU threshold for NMS
-> > iteration: type=int, default=400, help=how many iterations to feature-inversion
-> > device: type=str, default='0', help=cuda device, i.e. 0 or 0,1,2,3 or cpu
-> > eval: type=str, default=False, help=show various evaluation tools : blur_image, inference_time, cos_similarity, de-identification value(SSIM)
-"""
+    - Adjusted_params
+    > > image(single): type=numpy.ndarray help=image to make blur : content_image
+    > > distort_weight: type=int, default=1, help=(1~5) As the weight increases, the face becomes increasingly distorted.
+    > > fade_weight: type=int, default=1, help=(1~5) As the weight increases, the face gradually fades.
+    > > dataset_folder(default): type=str, help=original content face images directory
 
 
-    
+    - Additional_params
+    > > save_folder: type=str, default=None, help=directory to save blur images
+    > > weights: type=str, default='./weights/face_l.pt', help=(face_detector)_model.pt path(s)
+    > > img_size: type=int, default=640, help=(face_detector)_inference size (pixels)
+    > > conf_thres: type=float, default=0.5, help=(face_detector)_object confidence threshold
+    > > iou_thres:  type=float, default=0.5, help=(face_detector)_IOU threshold for NMS
+    > > iteration: type=int, default=400, help=how many iterations to feature-inversion
+    > > device: type=str, default='0', help=cuda device, i.e. 0 or 0,1,2,3 or cpu
+    > > eval: type=str, default=False, help=show various evaluation tools : blur_image, inference_time, cos_similarity, de-identification value(SSIM)
+    """
+
+
     if eval:
         #time check
         start_time = time.time()
@@ -207,15 +207,29 @@ Explain
             # bounding box list
             bbox_list.append( (x1,y1,x2,y2) )
 
-            # delete face bbox
-            imgB[y1:y2, x1:x2, :] -= imgB[y1:y2, x1:x2, :]
+            # eclipse synthesize
+            #center (x,y)
+            x = (x1+x2)//2
+            y = (y1+y2)//2
 
-            #synthesize uniform random noise
-            imgB[y1:y2, x1:x2, :] += np.array(np.random.uniform(low=0, high=255, size=(y2-y1, x2-x1, 3)), dtype='uint8')# 픽셀값 0~255 정수
+            #long_axis, short_axis
+            l = round((y2-y1)*(9/16))
+            s = round((x2-x1)*(5/8))
+
+            #make eclipse mask
+            mask = np.zeros((h,w), dtype=np.int8)
+            cv2.ellipse(mask, (x, y), (l, s), 90, 0, 360, (1,1,1), -1)
+
+            # delete face bounding circle
+            imgB = imgB - imgB*mask[...,np.newaxis]
+
+            # synthesize blur face circle
+            random = np.array(np.random.uniform(low=0, high=255, size=(h, w, 3)), dtype='uint8')# 0~255
+            imgB = imgB + random*mask[...,np.newaxis]
                 
         # numpy(cv2) -> torch.Tensor | Resize(512) | Normalize(squeeze_mean, squeeze_std)
         imgC = preprocess(PIL.Image.fromarray(imgC))
-        imgB = preprocess(PIL.Image.fromarray(imgB))
+        imgB = preprocess(PIL.Image.fromarray(imgB.astype(np.uint8)))
         
         # Extract Zero(original)_image feature
         featsC = extract_features(imgC, cnn, device=device)
@@ -269,18 +283,31 @@ Explain
             
             if eval:
                 #imgD == imgC for now
-                de_identifi += 1 - SSIM_score(original_crop = PIL.Image.fromarray(imgD[bbox[1]:bbox[3], bbox[0]:bbox[2], :]), 
-                                              generate_crop = PIL.Image.fromarray(imgB_result[bbox[1]:bbox[3], bbox[0]:bbox[2], :]),
+                de_identifi += 1 - SSIM_score(original_crop = PIL.Image.fromarray(imgD[bbox[1]:bbox[3], bbox[0]:bbox[2], :].astype(np.uint8)), 
+                                              generate_crop = PIL.Image.fromarray(imgB_result[bbox[1]:bbox[3], bbox[0]:bbox[2], :].astype(np.uint8)),
                                               device=device)
 
-            # delete face bbox
-            imgD[bbox[1]:bbox[3], bbox[0]:bbox[2], :] -= imgD[bbox[1]:bbox[3], bbox[0]:bbox[2], :]
-            
-            # synthesize blur result faces
-            imgD[bbox[1]:bbox[3], bbox[0]:bbox[2], :] += imgB_result[bbox[1]:bbox[3], bbox[0]:bbox[2], :]
+            #eclipse synthesize
+            #center (x,y)
+            x = (bbox[0]+bbox[2])//2
+            y = (bbox[1]+bbox[3])//2
+
+            #long_axis, short_axis
+            l = round((y2-y1)*(9/16))
+            s = round((x2-x1)*(5/8))
+
+            #make eclipse mask
+            mask = np.zeros((h,w), dtype=np.int8)
+            cv2.ellipse(mask, (x, y), (l, s), 90, 0, 360, (1,1,1), -1)
+
+            # delete face bounding circle
+            imgD = imgD - imgD*mask[...,np.newaxis]
+
+            # synthesize blur face circle
+            imgD = imgD + imgB_result*mask[...,np.newaxis]
         
         # np.array -> PIL.Image
-        imgD = PIL.Image.fromarray(imgD)
+        imgD = PIL.Image.fromarray(imgD.astype(np.uint8))
         
         # Extract Blur faces+ Content images
         featsD = extract_features(preprocess(imgD), cnn, device=device)
@@ -329,4 +356,4 @@ Explain
 
 # +
 # Test
-# blur_list = face_blur_multi(distort_weight = 5, fade_weight = 2, dataset_folder = './data/img/', save_folder = None, eval=False)
+# blur_list = face_blur(distort_weight = 5, fade_weight = 2, dataset_folder = './data/img/', save_folder = None, eval=False)
