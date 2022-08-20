@@ -12,7 +12,7 @@ De-identify the face while preserving image feature using feature inversion, cyc
 
 - Feature Inversion
 
-  - <img width="300" alt="teaser" src="./data/result/blur_eunbin2.jpg">
+  - <img width="300" alt="teaser" src="./data/result/blur_eunbin.jpg">
 
 - CycleGAN
   - residual block
@@ -47,7 +47,7 @@ De-identify the face while preserving image feature using feature inversion, cyc
 >   - ```image```**(single)**: image to make blur : content_image
 >   - ```distort_weight```**(1~5)**: As the weight increases, the face becomes increasingly distorted.
 >   - ```fade_weight```**(1~5)**: As the weight increases, the face gradually fades.
->   - ```dataset_folder```**(multi)**: original content face images directory
+>   - ```dataset_folder```**(default)**: original content face images directory
 
 
 > - *Additional_params*
@@ -111,7 +111,7 @@ De-identify the face while preserving image feature using feature inversion, cyc
   --eval [boolean: True | False]
   ```
 
-2. face_blur_feature_inversion_func_ver.py
+2. face_blur_feature_inversion_func.py
 
   ```
   def face_blur_multi(distort_weight=[int: 1-5], fade_weight=[int: 1-5], dataset_folder=[str: image path],
@@ -128,12 +128,15 @@ De-identify the face while preserving image feature using feature inversion, cyc
   weights=[str: yolov5 weight path], eval = [boolean: True | False])
   ```
 
+4. face_blur_feature_inversion_func_single.ipynb
+
+  > it contains the results of the execution
+
 
 ### One images with One-faces
 
 
-
-4. face_blur_GAN_func_single.py
+5. face_blur_GAN_func_single.py
 
   ```
   def face_blur_GAN_single(img, save_path=[None | str: save path],
