@@ -107,64 +107,76 @@ def rescale(x): # MINMAX Standardization
 
 # -
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser()
+def face_blur(distort_weight, fade_weight, dataset_folder, save_folder=None, weights='./weights/face_l.pt', img_size=640, conf_thres=0.5, iou_thres=0.5,
+              iteration=400, device='0', eval = False, circle = True):
     
-    parser.add_argument('--distort_weight', nargs='?', type=int, default=1, help='(1~5) As the weight increases, the face becomes increasingly distorted.')
-    parser.add_argument('--fade_weight', nargs='?', type=int, default=1, help='(1~5) As the weight increases, the face gradually fades.')
-    parser.add_argument('--dataset_folder', type=str, help='original content face images directory')
-    parser.add_argument('--save_folder', type=str, default=None, help='directory to save blur images')
-    parser.add_argument('--weights', nargs='+', type=str, default='./weights/face_l.pt', help='(face_detector)_model.pt path(s)')
-    parser.add_argument('--img_size', type=int, default=640, help='(face_detector)_inference size (pixels)')
-    parser.add_argument('--conf_thres', type=float, default=0.5, help='(face_detector)_object confidence threshold')
-    parser.add_argument('--iou_thres', type=float, default=0.5, help='(face_detector)_IOU threshold for NMS')
-    parser.add_argument('--iteration', type=int, default=400, help='how many iterations to feature-inversion')
-    parser.add_argument('--device', type=str, default='0', help='cuda device, i.e. 0 or 0,1,2,3 or cpu')
-    parser.add_argument('--eval', type=str, default=False, help='show various evaluation tools : blur_image, inference_time, cos_similarity, de-identification value(SSIM)')
     
-    opt = parser.parse_args()
-    print(opt)
-    
-    if not opt.eval == 'False':
+    """
+    Explain
+
+    - Adjusted_params
+    > > image(single): type=numpy.ndarray help=image to make blur : content_image
+    > > distort_weight: type=int, default=1, help=(1~5) As the weight increases, the face becomes increasingly distorted.
+    > > fade_weight: type=int, default=1, help=(1~5) As the weight increases, the face gradually fades.
+    > > dataset_folder(default): type=str, help=original content face images directory
+
+
+    - Additional_params
+    > > save_folder: type=str, default=None, help=directory to save blur images
+    > > weights: type=str, default='./weights/face_l.pt', help=(face_detector)_model.pt path(s)
+    > > img_size: type=int, default=640, help=(face_detector)_inference size (pixels)
+    > > conf_thres: type=float, default=0.5, help=(face_detector)_object confidence threshold
+    > > iou_thres:  type=float, default=0.5, help=(face_detector)_IOU threshold for NMS
+    > > iteration: type=int, default=400, help=how many iterations to feature-inversion
+    > > device: type=str, default='0', help=cuda device, i.e. 0 or 0,1,2,3 or cpu
+    > > eval: type=str, default=False, help=show various evaluation tools : blur_image, inference_time, cos_similarity, de-identification value(SSIM)
+    > > circle: type=bool, default=True, help=blur face in shape of circle or rectangle, if False, its rectangle
+    """
+
+
+    if eval:
         #time check
         start_time = time.time()
     
     # Load model
-    device = select_device(opt.device)
-    model = attempt_load(opt.weights, map_location=device)  # load FP32 model
+    device = select_device(device)
+    model = attempt_load(weights, map_location=device)  # load FP32 model
     
     # Set up optimization hyperparameters
     initial_lr = 3.0
     decayed_lr = 0.1
-    decay_lr_at = 0.9*opt.iteration
+    decay_lr_at = 0.9*iteration
 
     # Blur hyperparameters
     
-    if opt.distort_weight > 5: # error exception
-        opt.distort_weight = 5
-    elif opt.distort_weight < 1:
-        opt.distort_weight = 1
+    if distort_weight > 5: # error exception
+        distort_weight = 5
+    elif distort_weight < 1:
+        distort_weight = 1
     
-    if opt.fade_weight > 5: # error exception
-        opt.fade_weight = 5
-    elif opt.fade_weight < 1:
-        opt.fade_weight = 1
+    if fade_weight > 5: # error exception
+        fade_weight = 5
+    elif fade_weight < 1:
+        fade_weight = 1
         
     fade_dict = {1: 3e11, 2: 7e11, 3: 1e12, 4: 5e12, 5: 9e12}
     distort_dict = {1: 5, 2: 6, 3: 7, 4: 8, 5: 9}
-    target_layer = distort_dict[opt.distort_weight] #target_layer, the layer that do inverse feature from
+    target_layer = distort_dict[distort_weight] #target_layer, the layer that do inverse feature from
     
     # testing dataset
-    testset_folder = opt.dataset_folder
+    testset_folder = dataset_folder
     
     #-------------------------------
-    #synthesize random
+    
+    # blur images list
+    blur_list = []
+    
     for image_path in tqdm(glob.glob(os.path.join(testset_folder, '*'))):
         
         #image_name
         img_name = os.path.basename(image_path)[:-4]
         
-        if not opt.eval == 'False':
+        if eval:
             #time check
             infer_start_time = time.time()
         
@@ -181,7 +193,7 @@ if __name__ == '__main__':
             continue
         
         #yolov5_face_detect
-        boxes = detect(model, imgC, opt.img_size, opt.conf_thres, opt.iou_thres, device) #conf > 0.5
+        boxes = detect(model, imgC, img_size, conf_thres, iou_thres, device) #conf > 0.5
 
         bbox_list = []
         
@@ -195,26 +207,35 @@ if __name__ == '__main__':
 
             # bounding box list
             bbox_list.append( (x1,y1,x2,y2) )
+            
+            if circle:
+                ####### eclipse ########
+                #center (x,y)
+                x = (x1+x2)//2
+                y = (y1+y2)//2
 
-            # eclipse synthesize
-            #center (x,y)
-            x = (x1+x2)//2
-            y = (y1+y2)//2
+                #long_axis, short_axis
+                l = round((y2-y1)*(9/16))
+                s = round((x2-x1)*(5/8))
 
-            #long_axis, short_axis
-            l = round((y2-y1)*(9/16))
-            s = round((x2-x1)*(5/8))
+                #make eclipse mask
+                mask = np.zeros((h,w), dtype=np.int8)
+                cv2.ellipse(mask, (x, y), (l, s), 90, 0, 360, (1,1,1), -1)
 
-            #make eclipse mask
-            mask = np.zeros((h,w), dtype=np.int8)
-            cv2.ellipse(mask, (x, y), (l, s), 90, 0, 360, (1,1,1), -1)
+                # delete face bounding circle
+                imgB = imgB - imgB*mask[...,np.newaxis]
 
-            # delete face bounding circle
-            imgB = imgB - imgB*mask[...,np.newaxis]
+                # synthesize blur face circle
+                random = np.array(np.random.uniform(low=0, high=255, size=(h, w, 3)), dtype='uint8')# 0~255
+                imgB = imgB + random*mask[...,np.newaxis]
+            
+            else:
+                ######rectangle######
+                # delete face bbox
+                imgB[y1:y2, x1:x2, :] -= imgB[y1:y2, x1:x2, :]
 
-            # synthesize blur face circle
-            random = np.array(np.random.uniform(low=0, high=255, size=(h, w, 3)), dtype='uint8')# 0~255
-            imgB = imgB + random*mask[...,np.newaxis]
+                #synthesize uniform random noise
+                imgB[y1:y2, x1:x2, :] += np.array(np.random.uniform(low=0, high=255, size=(y2-y1, x2-x1, 3)), dtype='uint8')
                 
         # numpy(cv2) -> torch.Tensor | Resize(512) | Normalize(squeeze_mean, squeeze_std)
         imgC = preprocess(PIL.Image.fromarray(imgC))
@@ -230,7 +251,7 @@ if __name__ == '__main__':
         optimizer = torch.optim.Adam([imgB], lr=initial_lr)
         
         #Feature-Inversion in times of iteration
-        for t in range(opt.iteration):
+        for t in range(iteration):
             
             #Initialize weight
             optimizer.zero_grad()
@@ -240,20 +261,20 @@ if __name__ == '__main__':
                 optimizer = torch.optim.Adam([imgB], lr=decayed_lr) 
             
             #(Clamping) 0.95*iteration이면, imgB weight bound in (-1.5, 1.5) -> nonlinearity like relu
-            if t < 0.95*opt.iteration:
+            if t < 0.95*iteration:
                 imgB.data.clamp_(-1.5, 1.5)
 
             # Extract updated Blur_image feature
             featsB = extract_features(imgB, cnn, device=device)
             
             # Loss
-            loss = face_loss(fade_dict[opt.fade_weight], featsB[target_layer], featsC[target_layer])
+            loss = face_loss(fade_dict[fade_weight], featsB[target_layer], featsC[target_layer])
             
             # update the amount of loss
             loss.backward()
             optimizer.step()
         
-        if not opt.eval == 'False':
+        if eval:
             #Cos-sim btw blur_image, Content_image of target_layer
             cos = torch.nn.CosineSimilarity(dim=0)
             cos_sim = cos(torch.flatten(featsB[target_layer]), torch.flatten(featsC[target_layer]))
@@ -270,38 +291,46 @@ if __name__ == '__main__':
         de_identifi=0
         for bbox in bbox_list:
             
-            if not opt.eval == 'False':
+            if eval:
                 #imgD == imgC for now
                 de_identifi += 1 - SSIM_score(original_crop = PIL.Image.fromarray(imgD[bbox[1]:bbox[3], bbox[0]:bbox[2], :].astype(np.uint8)), 
                                               generate_crop = PIL.Image.fromarray(imgB_result[bbox[1]:bbox[3], bbox[0]:bbox[2], :].astype(np.uint8)),
                                               device=device)
+            if circle:
+                ####### eclipse ######
+                #center (x,y)
+                x = (bbox[0]+bbox[2])//2
+                y = (bbox[1]+bbox[3])//2
 
-            #eclipse synthesize
-            #center (x,y)
-            x = (bbox[0]+bbox[2])//2
-            y = (bbox[1]+bbox[3])//2
+                #long_axis, short_axis
+                l = round((y2-y1)*(9/16))
+                s = round((x2-x1)*(5/8))
 
-            #long_axis, short_axis
-            l = round((y2-y1)*(9/16))
-            s = round((x2-x1)*(5/8))
+                #make eclipse mask
+                mask = np.zeros((h,w), dtype=np.int8)
+                cv2.ellipse(mask, (x, y), (l, s), 90, 0, 360, (1,1,1), -1)
 
-            #make eclipse mask
-            mask = np.zeros((h,w), dtype=np.int8)
-            cv2.ellipse(mask, (x, y), (l, s), 90, 0, 360, (1,1,1), -1)
+                # delete face bounding circle
+                imgD = imgD - imgD*mask[...,np.newaxis]
 
-            # delete face bounding circle
-            imgD = imgD - imgD*mask[...,np.newaxis]
+                # synthesize blur face circle
+                imgD = imgD + imgB_result*mask[...,np.newaxis]
+            
+            else:
+                ######rectangle######
+                # delete face bbox
+                imgD[bbox[1]:bbox[3], bbox[0]:bbox[2], :] -= imgD[bbox[1]:bbox[3], bbox[0]:bbox[2], :]
 
-            # synthesize blur face circle
-            imgD = imgD + imgB_result*mask[...,np.newaxis]
-        
+                # synthesize blur result faces
+                imgD[bbox[1]:bbox[3], bbox[0]:bbox[2], :] += imgB_result[bbox[1]:bbox[3], bbox[0]:bbox[2], :]
+                
         # np.array -> PIL.Image
         imgD = PIL.Image.fromarray(imgD.astype(np.uint8))
         
         # Extract Blur faces+ Content images
         featsD = extract_features(preprocess(imgD), cnn, device=device)
         
-        if not opt.eval == 'False':
+        if eval:
             de_identification = de_identifi/len(bbox_list) #mean of faces
 
             #Cos-sim btw output feature of squeezenet
@@ -327,18 +356,22 @@ if __name__ == '__main__':
 
             #Inference time of a image
             print(f"{img_name} 걸린 시간: {time.time() - infer_start_time: .2f}s")
-
+            
             #Total time of images
             print(f'--------------------------------------------------')
             print(f'총 시간: {time.time() - start_time: .2f}s')
-        else:
-            cos_similarity = 0
-            de_identification = 0
+
+        blur_list.append(imgD)
         
         #Save
-        if opt.save_folder == 'None':
+        if save_folder is None:
             pass
         else:
-            os.makedirs(f"{opt.save_folder}{img_name}/", exist_ok=True)
-            imgD.save(f'{opt.save_folder}{img_name}/blur_{img_name}-d{opt.distort_weight}-f{opt.fade_weight}-c{cos_similarity*100:.1f}-s{de_identification*100:.1f}.jpg', 'JPEG')
+            os.makedirs(f"{save_folder}{img_name}/", exist_ok=True)
+            imgD.save(f'{save_folder}{img_name}/blur_{img_name}-d{distort_weight}-f{fade_weight}-c{cos_similarity*100:.1f}-s{de_identification*100:.1f}.jpg', 'JPEG')
+    
+    return blur_list #dtype = PIL.Image
 
+# +
+# Test
+# blur_list = face_blur(distort_weight = 2, fade_weight = 2, dataset_folder = './data/img/', save_folder = None, eval=True, circle=True)

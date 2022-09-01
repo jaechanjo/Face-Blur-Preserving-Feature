@@ -7,6 +7,7 @@ from albumentations.pytorch import ToTensorV2
 import albumentations as A
 from torch.utils.data import DataLoader
 from torchvision.utils import save_image, make_grid
+import torchvision.transforms as transforms
 from PIL import Image
 import numpy as np
 import cv2
@@ -41,9 +42,9 @@ class ResidualBlock(nn.Module):
         return x + self.block(x)
 
 
-class Stitching(nn.Module):
+class Stitching_rect(nn.Module):
     def __init__(self):
-        super(Stitching, self).__init__()
+        super(Stitching_rect, self).__init__()
 
     def forward(self, x, ori, bbox):
         h, w = x.shape[-2:]
@@ -59,15 +60,58 @@ class Stitching(nn.Module):
         return out
 
 
+class Stitching_circle(nn.Module):
+    def __init__(self):
+        super(Stitching_circle, self).__init__()
+
+    def forward(self, x, ori, bbox):
+        h, w = x.shape[-2:]
+        bbox[:, 0] = bbox[:, 0] * h
+        bbox[:, 1] = bbox[:, 1] * w
+        bbox[:, 2] = bbox[:, 2] * h
+        bbox[:, 3] = bbox[:, 3] * w
+        
+        out = ori.clone()
+        
+        transform = transforms.ToTensor()
+        
+        for n, (_x, _o, box) in enumerate(zip(x, ori, bbox)):
+            x1, y1, x2, y2, _ = list(map(int, box))
+            
+            #center (x,y)
+            x = (x1+x2)//2
+            y = (y1+y2)//2
+            
+            #long_axis, short_axis
+            l = round((y2-y1)*(9/16))
+            s = round((x2-x1)*(5/8))
+            
+            #make eclipse mask
+            mask = np.zeros((h,w), dtype=np.int8)
+            cv2.ellipse(mask, (x, y), (l, s), 90, 0, 360, (1,1,1), -1)
+            
+            #make background mask
+            mask_bg = np.ones((h,w), dtype=np.int8)
+            cv2.ellipse(mask_bg, (x, y), (l, s), 90, 0, 360, (0,0,0), -1)
+            
+            #origin background mask + blur face mask
+            out[n, ...] = _o.clone()*transform(mask_bg).cuda().unsqueeze(0)+ _x.clone()*transform(mask).cuda().unsqueeze(0)
+        return out
+
+
 class Wrapper(nn.Module):
     def __init__(self, generator):
         super(Wrapper, self).__init__()
         self.generator = generator
-        self.stitching = Stitching()
+        self.stitching_rect = Stitching_rect()
+        self.stitching_circle = Stitching_circle()
 
-    def forward(self, img, origin, bbox):
+    def forward(self, img, origin, bbox, circle):
         g = self.generator(img)
-        x = self.stitching(g, origin, bbox)
+        if circle:
+            x = self.stitching_circle(g, origin, bbox)
+        else:
+            x = self.stitching_rect(g, origin, bbox)
         return x
 
 
@@ -177,7 +221,6 @@ class GeneratorResNet_no_residual_block(nn.Module):
             return summary(self, input_size, batch_size, device)
         except:
             return self.__repr__()
-
 
 
 def transform_tensor_to_image(tensor):
