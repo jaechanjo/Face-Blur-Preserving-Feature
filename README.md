@@ -44,22 +44,22 @@ De-identify the face while preserving image feature using feature inversion, cyc
 ### Hyper-parameter description
 
 > - *Adjusted_params*
->   - ```image```**(single)**: image to make blur : content_image
->   - ```distort_weight```**(1~5)**: As the weight increases, the face becomes increasingly distorted.
->   - ```fade_weight```**(1~5)**: As the weight increases, the face gradually fades.
->   - ```dataset_folder```**(default)**: original content face images directory
+>   - ```image```**(single)**: image to make blur : content_image. (입력 이미지)
+>   - ```distort_weight```**(1~5)**: As the weight increases, the face becomes increasingly distorted. (왜곡 가중치, 얼굴 왜곡 정도)
+>   - ```fade_weight```**(1~5)**: As the weight increases, the face gradually fades. (희석 가중치, 얼굴 희미한 정도)
+>   - ```dataset_folder```**(default)**: original content face images directory. (입력 이미지 폴더 경로)
 
 
 > - *Additional_params*
->   - ```save_folder```: type=str, help=directory to save blur results
->   - ```weights```: type=str, default='./weights/face_l.pt', help=(face_detector)_model.pt path(s)
->   - ```img_size```: type=int, default=640, help=(face_detector)_inference size (pixels)
->   - ```conf_thres```: type=float, default=0.5, help=(face_detector)_object confidence threshold
->   - ```iou_thres```:  type=float, default=0.5, help=(face_detector)_IOU threshold for NMS
->   - ```iteration```: type=int, default=400, help=how many iterations to feature-inversion
->   - ```device```: type=str, default='0', help=cuda device, i.e. 0 or 0,1,2,3 or cpu
->   - ```eval```: type=str, default=False, help=show various evaluation tools : blur_image, inference_time, cos_similarity, de-identification value(SSIM)
-
+>   - ```save_folder```: directory to save blur results. (결과 이미지 저장 폴더 경로)
+>   - ```weights```: (face_detector)_model.pt path(s). (얼굴 탐지 모델 가중치 파일 경로)
+>   - ```img_size```: (face_detector)_inference size (pixels). (얼굴 탐지 모델 입력 이미지 크기)
+>   - ```conf_thres```: (face_detector)_object confidence threshold. (얼굴 탐지 확신 정도 기준 값)
+>   - ```iou_thres```:  (face_detector)_IOU threshold for NMS. (얼굴 탐지 겹친 영역 정도 기준 값)
+>   - ```iteration```: how many iterations to feature-inversion. (학습 횟수)
+>   - ```device```: cuda device, i.e. 0 or 0,1,2,3 or cpu. (GPU 설정)
+>   - ```eval```: show various evaluation tools : blur_image, inference_time, cos_similarity, SSIM. (평가 지표 출력 여부)
+>   - ```circle```: blur face in shape of circle or rectangle, if False, its rectangle. (비식별화 모양, 타원형 | 직사각형)
 
 ### 2. CycleGAN
 
@@ -72,14 +72,16 @@ De-identify the face while preserving image feature using feature inversion, cyc
 
 
 > - *Additional_params*
->   - ```save_path```: directory to save blur images
->   - ```G_model_path```: Generator_model.pt path(s)
->   - ```Y_model_path```: Yolov5(face_detector)_model.pt path(s)
->   - ```transform```: To do transform
->   - ```img_size```: (face_detector) inference size (pixels)
->   - ```conf_thres```: (face_detector) object confidence threshold
->   - ```iou_thres```: (face_detector) IOU threshold for NMS
->   - ```device```: cuda device, i.e. 0 or 0,1,2,3 or cpu
+>   - ```save_path```: directory to save blur images. (결과 이미지 저장 폴더 경로)
+>   - ```G_model_path```: Generator_model.pt path(s). (생성 모델 가중치 파일 경로)
+>   - ```Y_model_path```: Yolov5(face_detector)_model.pt path(s). (얼굴 탐지 모델 가중치 파일 경로)
+>   - ```transform```: To do transform. (이미지 사이즈, 정규화, 텐서 변환 여부)
+>   - ```img_size```: (face_detector) inference size (pixels). (얼굴 탐지 모델 입력 이미지 크기)
+>   - ```conf_thres```: (face_detector) object confidence threshold. (얼굴 탐지 확신 정도 기준 값)
+>   - ```iou_thres```: (face_detector) IOU threshold for NMS. (얼굴 탐지 겹친 영역 정도 기준 값)
+>   - ```device```: cuda device, i.e. 0 or 0,1,2,3 or cpu. (GPU 설정)
+>   - ```residual_block```: whether the generator has residual block or not. (잔차 층 추가 여부)
+>   - ```circle```: blur face in shape of circle or rectangle, if False, its rectangle. (비식별화 모양, 타원형 | 직사각형)
 
 
 ## Setup
@@ -108,14 +110,16 @@ De-identify the face while preserving image feature using feature inversion, cyc
   --fade_weight [int: 1~5] \
   --dataset_folder [str: image path] \
   --save_folder [None | str: save path] \
-  --eval [boolean: True | False]
+  --eval [boolean: True | False] \
+  --circle [boolean: True | False]
   ```
 
 2. face_blur_feature_inversion_func.py
 
   ```
   def face_blur_multi(distort_weight=[int: 1-5], fade_weight=[int: 1-5], dataset_folder=[str: image path],
-  save_folder=[None | str: save path], weights=[str: yolov5 weight path], eval = [boolean: True | False])
+                      save_folder=[None | str: save path], weights=[str: yolov5 weight path], 
+                      eval = [boolean: True | False], circle = [boolean: True | False])
   ```
 
 
@@ -125,7 +129,7 @@ De-identify the face while preserving image feature using feature inversion, cyc
 
   ```
   def face_blur_single(image, distort_weight=[int: 1-5], fade_weight=[int: 1-5], save_folder=[None | str: save path],
-  weights=[str: yolov5 weight path], eval = [boolean: True | False])
+                       weights=[str: yolov5 weight path], eval = [boolean: True | False], circle = [boolean: True | False])
   ```
 
 4. face_blur_feature_inversion_func_single.ipynb
@@ -140,6 +144,7 @@ De-identify the face while preserving image feature using feature inversion, cyc
 
   ```
   def face_blur_GAN_single(img, save_path=[None | str: save path],
-  G_model_path=[str: generator weight path], Y_model_path=[str: yolov5(face_detector) weight path])
+                           G_model_path=[str: generator weight path], Y_model_path=[str: yolov5(face_detector) weight path], 
+                           residual_block = [boolean: True | False], circle = [boolean: True | False])
   ```
   
