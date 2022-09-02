@@ -1,0 +1,23 @@
+version: '2.3'
+  
+services:
+  main:
+    container_name: "face_blur"
+    build:
+      context: "./"
+      dockerfile: Dockerfile
+    runtime: nvidia
+    restart: always
+    env_file:
+      - "docker-compose-env/main.env"
+    volumes:
+      - "./:/workspace/"
+    expose:
+      - "8000"
+    ports:dock
+      - "30000:8888"
+      - "30001:8097"
+      - "30002:22"
+    ipc: host
+    stdin_open: true
+    tty: true
