@@ -136,7 +136,7 @@ De-identify the face while preserving image feature using feature inversion, cyc
   ```
 
 
-### One images with One-faces(얼굴 하나 포함된 이미지 한 개 실행할 때)
+### One images with One-faces
 > #### 단일 얼굴 이미지 한 장 단위
 
 4. face_blur_GAN_func_single.py
