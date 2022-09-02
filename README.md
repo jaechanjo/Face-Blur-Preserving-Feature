@@ -90,8 +90,8 @@ De-identify the face while preserving image feature using feature inversion, cyc
 
 ```
 $ cd ${WORKSPACE}
-$ git clone https://${GITHUB_PERSONAL_TOKEN}@github.com/JinhaSong/GrandChallengeTestEnv
-$ cd GrandChallengeTestEnv
+$ git clone https://${GITHUB_PERSONAL_TOKEN}@github.com/jaechanjo/Face-Blur-Preserving-Feature.git
+$ cd Face-Blur-Preserving-Feature
 $ docker-compose up -d
 ```
 
@@ -99,7 +99,9 @@ $ docker-compose up -d
 
 ### 2. Packages
 
-```cat requirements.txt | while read PACKAGE; do pip install "$PACKAGE"; done```
+```
+$ cat requirements.txt | while read PACKAGE; do pip install "$PACKAGE"; done
+```
 
  > **install error**를 무시하고 설치합니다.
 
@@ -112,7 +114,7 @@ $ docker-compose up -d
 1. face_blur_feature_inversion.py
   
   ```
-  python face_blur_feature_inversion.py \
+  $ python face_blur_feature_inversion.py \
   --distort_weight [int: 1~5] \
   --fade_weight [int: 1~5] \
   --dataset_folder [str: image path] \
@@ -124,7 +126,7 @@ $ docker-compose up -d
 2. face_blur_feature_inversion_func.py
 
   ```
-  def face_blur_multi(distort_weight=[int: 1-5], fade_weight=[int: 1-5], dataset_folder=[str: image path],
+  $ def face_blur_multi(distort_weight=[int: 1-5], fade_weight=[int: 1-5], dataset_folder=[str: image path],
                       save_folder=[None | str: save path], weights=[str: yolov5 weight path], 
                       eval = [boolean: True | False], circle = [boolean: True | False])
   ```
@@ -136,7 +138,7 @@ $ docker-compose up -d
 3. face_blur_feature_inversion_func_single.py
 
   ```
-  def face_blur_single(image, distort_weight=[int: 1-5], fade_weight=[int: 1-5], save_folder=[None | str: save path],
+  $ def face_blur_single(image, distort_weight=[int: 1-5], fade_weight=[int: 1-5], save_folder=[None | str: save path],
                        weights=[str: yolov5 weight path], eval = [boolean: True | False], circle = [boolean: True | False])
   ```
 
@@ -147,7 +149,7 @@ $ docker-compose up -d
 4. face_blur_GAN_func_single.py
 
   ```
-  def face_blur_GAN_single(img, save_path=[None | str: save path],
+  $ def face_blur_GAN_single(img, save_path=[None | str: save path],
                            G_model_path=[str: generator weight path], Y_model_path=[str: yolov5(face_detector) weight path], 
                            residual_block = [boolean: True | False], circle = [boolean: True | False])
   ```
