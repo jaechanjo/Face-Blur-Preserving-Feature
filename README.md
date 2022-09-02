@@ -88,7 +88,12 @@ De-identify the face while preserving image feature using feature inversion, cyc
 
 ### 1. Docker compose
 
-```docker compose up -d```
+```
+$ cd ${WORKSPACE}
+$ git clone https://${GITHUB_PERSONAL_TOKEN}@github.com/JinhaSong/GrandChallengeTestEnv
+$ cd GrandChallengeTestEnv
+$ docker-compose up -d
+```
 
  > **git clone한 directory**에서 위 명령어를 실행합니다.
 
