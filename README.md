@@ -86,21 +86,23 @@ De-identify the face while preserving image feature using feature inversion, cyc
 
 ## Setup
 
-### Docker compose
+### 1. Docker compose
 
-```docker run --gpus all -itd -e LC_ALL=C.UTF-8 --name face_blur -v"[gpu server dir]":/workspace/ -p 20000:8888 -p 20001:8097 -p 20002:22 nvcr.io/nvidia/pytorch:21.07-py3 /bin/bash```
+```docker compose up -d```
 
-  > - **docker name(이름 정의)**: e.g.) face_blur
-  > - **gpu server dir(도커 가상환경에 연결할 GPU 서버 폴더 경로)**: git clone dir(깃클론한 폴더 경로를 넣어주세요) e.g.) /media/mmlab/hdd3/Face-Blur-Preserving-Feature 
-  > - **mounted docker dir(연결된 도커 폴더 경로)**: e.g.) /workspace/
-  > - **port forwading(포트 설정)**: e.g.) 20000:8888(jupyter), 20001:8097(visdom), 20002:22(ssh)
-  > - **docker image(도커 이미지)**: e.g.) nvcr.io/nvidia/pytorch:21.07-py3
+ > **git clone한 directory**에서 위 명령어를 실행합니다.
 
+### 2. Packages
+
+```cat requirements.txt | while read PACKAGE; do pip install "$PACKAGE"; done```
+
+ > **install error**를 무시하고 설치합니다.
 
 ## Inference code
 
 
 ### Multi images with Multi-faces
+> #### 다중 얼굴 이미지 폴더 단위
 
 1. face_blur_feature_inversion.py
   
@@ -124,6 +126,7 @@ De-identify the face while preserving image feature using feature inversion, cyc
 
 
 ### One images with Multi-faces
+> #### 다중 얼굴 이미지 한 장 단위
 
 3. face_blur_feature_inversion_func_single.py
 
@@ -132,15 +135,11 @@ De-identify the face while preserving image feature using feature inversion, cyc
                        weights=[str: yolov5 weight path], eval = [boolean: True | False], circle = [boolean: True | False])
   ```
 
-4. face_blur_feature_inversion_func_single.ipynb
 
-  > it contains the results of the execution
+### One images with One-faces(얼굴 하나 포함된 이미지 한 개 실행할 때)
+> #### 단일 얼굴 이미지 한 장 단위
 
-
-### One images with One-faces
-
-
-5. face_blur_GAN_func_single.py
+4. face_blur_GAN_func_single.py
 
   ```
   def face_blur_GAN_single(img, save_path=[None | str: save path],
