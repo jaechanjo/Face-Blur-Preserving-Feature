@@ -126,7 +126,7 @@ $ cat requirements.txt | while read PACKAGE; do pip install "$PACKAGE"; done
 2. face_blur_feature_inversion_func.py
 
   ```
-  $ def face_blur_multi(distort_weight=[int: 1-5], fade_weight=[int: 1-5], dataset_folder=[str: image path],  # 위와 
+  $ def face_blur_multi(distort_weight=[int: 1-5], fade_weight=[int: 1-5], dataset_folder=[str: image path],  # 위와 동일
                       save_folder=[None | str: save path], weights=[str: yolov5 weight path], 
                       eval = [boolean: True | False], circle = [boolean: True | False])
   ```
