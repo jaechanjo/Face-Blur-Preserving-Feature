@@ -153,10 +153,9 @@ $ cat requirements.txt | while read PACKAGE; do pip install "$PACKAGE"; done
                            G_model_path=[str: generator weight path], Y_model_path=[str: yolov5(face_detector) weight path],  # 생성모델, 얼굴 디텍터 가중치 경로
                            residual_block = [boolean: True | False], circle = [boolean: True | False])  # residual block 추가 여부 
   ```
-  
+
   
 ## Reference
 
-```
-- Gatys, Leon A., Alexander S. Ecker, and Matthias Bethge. "Image style transfer using convolutional neural networks." Proceedings of the IEEE conference on computer vision and pattern recognition. 2016.
-```
+
+##### - Gatys, Leon A., Alexander S. Ecker, and Matthias Bethge. "Image style transfer using convolutional neural networks." Proceedings of the IEEE conference on computer vision and pattern recognition. 2016.
