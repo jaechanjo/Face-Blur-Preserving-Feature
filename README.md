@@ -89,10 +89,10 @@ De-identify the face while preserving image feature using feature inversion, cyc
 ### 1. Docker compose
 
 ```
-$ cd ${WORKSPACE}
+$ cd ${WORKSPACE}  # git clone할 directory
 $ git clone https://${GITHUB_PERSONAL_TOKEN}@github.com/jaechanjo/Face-Blur-Preserving-Feature.git
 $ cd Face-Blur-Preserving-Feature
-$ docker-compose up -d
+$ docker-compose up -d  # docker 만들기
 ```
 
  > **git clone한 directory**에서 위 명령어를 실행합니다.
@@ -115,18 +115,18 @@ $ cat requirements.txt | while read PACKAGE; do pip install "$PACKAGE"; done
   
   ```
   $ python face_blur_feature_inversion.py \
-  --distort_weight [int: 1~5] \
-  --fade_weight [int: 1~5] \
-  --dataset_folder [str: image path] \
-  --save_folder [None | str: save path] \
-  --eval [boolean: True | False] \
-  --circle [boolean: True | False]
+  --distort_weight [int: 1~5] \  # 정수 1~5
+  --fade_weight [int: 1~5] \  # 정수 1~5
+  --dataset_folder [str: image path] \  # 이미지 폴더 경로
+  --save_folder [None | str: save path] \  # 저장 폴더 경로
+  --eval [boolean: True | False] \  # 평가지표 표시 여부
+  --circle [boolean: True | False]  # 타원형 표시 여부
   ```
 
 2. face_blur_feature_inversion_func.py
 
   ```
-  $ def face_blur_multi(distort_weight=[int: 1-5], fade_weight=[int: 1-5], dataset_folder=[str: image path],
+  $ def face_blur_multi(distort_weight=[int: 1-5], fade_weight=[int: 1-5], dataset_folder=[str: image path],  # 위와 
                       save_folder=[None | str: save path], weights=[str: yolov5 weight path], 
                       eval = [boolean: True | False], circle = [boolean: True | False])
   ```
@@ -138,7 +138,7 @@ $ cat requirements.txt | while read PACKAGE; do pip install "$PACKAGE"; done
 3. face_blur_feature_inversion_func_single.py
 
   ```
-  $ def face_blur_single(image, distort_weight=[int: 1-5], fade_weight=[int: 1-5], save_folder=[None | str: save path],
+  $ def face_blur_single(image, distort_weight=[int: 1-5], fade_weight=[int: 1-5], save_folder=[None | str: save path],  # 비식별화할 이미지(nd.array)
                        weights=[str: yolov5 weight path], eval = [boolean: True | False], circle = [boolean: True | False])
   ```
 
@@ -149,8 +149,8 @@ $ cat requirements.txt | while read PACKAGE; do pip install "$PACKAGE"; done
 4. face_blur_GAN_func_single.py
 
   ```
-  $ def face_blur_GAN_single(img, save_path=[None | str: save path],
-                           G_model_path=[str: generator weight path], Y_model_path=[str: yolov5(face_detector) weight path], 
-                           residual_block = [boolean: True | False], circle = [boolean: True | False])
+  $ def face_blur_GAN_single(img, save_path=[None | str: save path],  # 비식별화할 이미지(nd.array)
+                           G_model_path=[str: generator weight path], Y_model_path=[str: yolov5(face_detector) weight path],  # 생성모델, 얼굴 디텍터 가중치 경로
+                           residual_block = [boolean: True | False], circle = [boolean: True | False])  # residual block 추가 여부 
   ```
   
