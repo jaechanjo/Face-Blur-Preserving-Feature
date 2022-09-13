@@ -159,5 +159,4 @@ $ cat requirements.txt | while read PACKAGE; do pip install "$PACKAGE"; done
 
 ```
 - Gatys, Leon A., Alexander S. Ecker, and Matthias Bethge. "Image style transfer using convolutional neural networks." Proceedings of the IEEE conference on computer vision and pattern recognition. 2016.
-
 ```
