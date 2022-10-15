@@ -322,8 +322,12 @@ if __name__ == '__main__':
         if not opt.eval == 'False':
             de_identification = de_identifi/len(bbox_list) #mean of faces
 
-            #Cos-sim btw output feature of squeezenet
-            cos_similarity = cos(torch.flatten(featsD[-1]), torch.flatten(featsC[-1]))
+            #Cos-sim btw target_layer feature of squeezenet
+            cos_sim_target = cos(torch.flatten(featsD[target_layer]), torch.flatten(featsC[target_layer]))
+        
+#         #Cos-sim btw output feature of squeezenet
+#         cos_sim_out = cos(torch.flatten(featsD[-1]), torch.flatten(featsC[-1]))
+    
 
             # Output(Content-original& Blur)
             f, axarr = plt.subplots(1,2, figsize=(10, 20))
@@ -339,7 +343,7 @@ if __name__ == '__main__':
             print(f"{img_name} 학습 정도-해당 층 feature (코사인)유사도(%): {cos_sim*100:.1f}")
 
             # 검색 성능 지표-CNN(squeezenet) output feature 유사도(imgD, imgC)
-            print(f"{img_name} 검색 지표-CNN(squeezenet) feature (코사인)유사도(%): {cos_similarity*100:.1f}")
+            print(f"{img_name} 검색 지표-CNN(squeezenet) feature (코사인)유사도(%): {cos_sim_target*100:.1f}")
             # 비식별화 값의 평균 (탐지된 얼굴들)
             print(f"{img_name} 비식별 값(1-SSIM)(%): {de_identification*100:.1f}")
 
@@ -358,5 +362,5 @@ if __name__ == '__main__':
             pass
         else:
             os.makedirs(f"{opt.save_folder}{img_name}/", exist_ok=True)
-            imgD.save(f'{opt.save_folder}{img_name}/blur_{img_name}-d{opt.distort_weight}-f{opt.fade_weight}-c{cos_similarity*100:.1f}-s{de_identification*100:.1f}.jpg', 'JPEG')
+            imgD.save(f'{opt.save_folder}{img_name}/blur_{img_name}-d{opt.distort_weight}-f{opt.fade_weight}-c{cos_sim_target*100:.1f}-s{de_identification*100:.1f}.jpg', 'JPEG')
 

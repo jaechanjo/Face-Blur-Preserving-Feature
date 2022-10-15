@@ -191,33 +191,33 @@ def face_blur_single(image, distort_weight, fade_weight, save_folder=None, weigh
         bbox_list.append( (x1,y1,x2,y2) )
         
         if circle:
-                ####### eclipse ########
-                #center (x,y)
-                x = (x1+x2)//2
-                y = (y1+y2)//2
+            ####### eclipse ########
+            #center (x,y)
+            x = (x1+x2)//2
+            y = (y1+y2)//2
 
-                #long_axis, short_axis
-                l = round((y2-y1)*(9/16))
-                s = round((x2-x1)*(5/8))
+            #long_axis, short_axis
+            l = round((y2-y1)*(9/16))
+            s = round((x2-x1)*(5/8))
 
-                #make eclipse mask
-                mask = np.zeros((h,w), dtype=np.int8)
-                cv2.ellipse(mask, (x, y), (l, s), 90, 0, 360, (1,1,1), -1)
+            #make eclipse mask
+            mask = np.zeros((h,w), dtype=np.int8)
+            cv2.ellipse(mask, (x, y), (l, s), 90, 0, 360, (1,1,1), -1)
 
-                # delete face bounding circle
-                imgB = imgB - imgB*mask[...,np.newaxis]
+            # delete face bounding circle
+            imgB = imgB - imgB*mask[...,np.newaxis]
 
-                # synthesize blur face circle
-                random = np.array(np.random.uniform(low=0, high=255, size=(h, w, 3)), dtype='uint8')# 0~255
-                imgB = imgB + random*mask[...,np.newaxis]
-            
-            else:
-                ######rectangle######
-                # delete face bbox
-                imgB[y1:y2, x1:x2, :] -= imgB[y1:y2, x1:x2, :]
+            # synthesize blur face circle
+            random = np.array(np.random.uniform(low=0, high=255, size=(h, w, 3)), dtype='uint8')# 0~255
+            imgB = imgB + random*mask[...,np.newaxis]
 
-                #synthesize uniform random noise
-                imgB[y1:y2, x1:x2, :] += np.array(np.random.uniform(low=0, high=255, size=(y2-y1, x2-x1, 3)), dtype='uint8')
+        else:
+            ######rectangle######
+            # delete face bbox
+            imgB[y1:y2, x1:x2, :] -= imgB[y1:y2, x1:x2, :]
+
+            #synthesize uniform random noise
+            imgB[y1:y2, x1:x2, :] += np.array(np.random.uniform(low=0, high=255, size=(y2-y1, x2-x1, 3)), dtype='uint8')
 
     # numpy(cv2) -> torch.Tensor | Resize(512) | Normalize(squeeze_mean, squeeze_std)
     imgC = preprocess(PIL.Image.fromarray(imgC))
@@ -279,32 +279,32 @@ def face_blur_single(image, distort_weight, fade_weight, save_folder=None, weigh
                                           generate_crop = PIL.Image.fromarray(imgB_result[bbox[1]:bbox[3], bbox[0]:bbox[2], :].astype(np.uint8)),
                                           device=device)
         if circle:
-                ####### eclipse ######
-                #center (x,y)
-                x = (bbox[0]+bbox[2])//2
-                y = (bbox[1]+bbox[3])//2
+            ####### eclipse ######
+            #center (x,y)
+            x = (bbox[0]+bbox[2])//2
+            y = (bbox[1]+bbox[3])//2
 
-                #long_axis, short_axis
-                l = round((y2-y1)*(9/16))
-                s = round((x2-x1)*(5/8))
+            #long_axis, short_axis
+            l = round((y2-y1)*(9/16))
+            s = round((x2-x1)*(5/8))
 
-                #make eclipse mask
-                mask = np.zeros((h,w), dtype=np.int8)
-                cv2.ellipse(mask, (x, y), (l, s), 90, 0, 360, (1,1,1), -1)
+            #make eclipse mask
+            mask = np.zeros((h,w), dtype=np.int8)
+            cv2.ellipse(mask, (x, y), (l, s), 90, 0, 360, (1,1,1), -1)
 
-                # delete face bounding circle
-                imgD = imgD - imgD*mask[...,np.newaxis]
+            # delete face bounding circle
+            imgD = imgD - imgD*mask[...,np.newaxis]
 
-                # synthesize blur face circle
-                imgD = imgD + imgB_result*mask[...,np.newaxis]
-            
-            else:
-                ######rectangle######
-                # delete face bbox
-                imgD[bbox[1]:bbox[3], bbox[0]:bbox[2], :] -= imgD[bbox[1]:bbox[3], bbox[0]:bbox[2], :]
+            # synthesize blur face circle
+            imgD = imgD + imgB_result*mask[...,np.newaxis]
 
-                # synthesize blur result faces
-                imgD[bbox[1]:bbox[3], bbox[0]:bbox[2], :] += imgB_result[bbox[1]:bbox[3], bbox[0]:bbox[2], :]
+        else:
+            ######rectangle######
+            # delete face bbox
+            imgD[bbox[1]:bbox[3], bbox[0]:bbox[2], :] -= imgD[bbox[1]:bbox[3], bbox[0]:bbox[2], :]
+
+            # synthesize blur result faces
+            imgD[bbox[1]:bbox[3], bbox[0]:bbox[2], :] += imgB_result[bbox[1]:bbox[3], bbox[0]:bbox[2], :]
 
     # np.array -> PIL.Image
     imgD = PIL.Image.fromarray(imgD.astype(np.uint8))
@@ -316,8 +316,11 @@ def face_blur_single(image, distort_weight, fade_weight, save_folder=None, weigh
         
         de_identification = de_identifi/len(bbox_list) #mean of faces
         
-        #Cos-sim btw output feature of squeezenet
-        cos_similarity = cos(torch.flatten(featsD[-1]), torch.flatten(featsC[-1]))
+        #Cos-sim btw target_layer feature of squeezenet
+        cos_sim_target = cos(torch.flatten(featsD[target_layer]), torch.flatten(featsC[target_layer]))
+        
+#         #Cos-sim btw output feature of squeezenet
+#         cos_sim_out = cos(torch.flatten(featsD[-1]), torch.flatten(featsC[-1]))
     
         # Output(Content-original& Blur)
         f, axarr = plt.subplots(1,2, figsize=(10, 20))
@@ -333,7 +336,7 @@ def face_blur_single(image, distort_weight, fade_weight, save_folder=None, weigh
         print(f"학습 정도-해당 층 feature (코사인)유사도(%): {cos_sim*100:.1f}")
 
         # 검색 성능 지표-CNN(squeezenet) output feature 유사도(imgD, imgC)
-        print(f"검색 지표-CNN(squeezenet) feature (코사인)유사도(%): {cos_similarity*100:.1f}")
+        print(f"검색 지표-CNN(squeezenet) feature (코사인)유사도(%): {cos_sim_target*100:.1f}")
         # 비식별화 값의 평균 (탐지된 얼굴들)
         print(f"비식별 값(1-SSIM)(%): {de_identification*100:.1f}")
 
@@ -346,7 +349,7 @@ def face_blur_single(image, distort_weight, fade_weight, save_folder=None, weigh
         pass
     else:
         os.makedirs(f"{save_folder}/", exist_ok=True)
-        imgD.save(f'{save_folder}/blur_d{distort_weight}-f{fade_weight}-c{cos_similarity*100:.1f}-s{de_identification*100:.1f}.jpg', 'JPEG')
+        imgD.save(f'{save_folder}/blur_d{distort_weight}-f{fade_weight}-c{cos_sim_target*100:.1f}-s{de_identification*100:.1f}.jpg', 'JPEG')
     
     print('done.')
     
