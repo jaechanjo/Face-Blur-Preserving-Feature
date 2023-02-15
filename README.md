@@ -1,6 +1,6 @@
 # Face-Blur
 
-Official Pytorch implementation of Face-Blur Model | [Paper](https://drive.google.com/file/d/14Krwy55_S4TZ3VeRlEemMd-R0gWAk0ml/view?usp=sharing)
+Official Pytorch implementation of Face-Blur Model | [Paper](https://drive.google.com/file/d/1WWVpRhUIyWVQBovvyZGyeGUG4fgMQLwm/view?usp=share_link)
 
 **[Jaechan Jo](mailto:jjc123a@naver.com), Jongseok Lee.**
 
